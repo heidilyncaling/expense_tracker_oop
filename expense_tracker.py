@@ -49,10 +49,16 @@ def get_user_expense():
 
     expense_categories = [
         "Food",
-        "Home",
-        "Work",
-        "Fun",
-        "Misc",
+        "Transport",
+        "Bills",
+        "Health",
+        "Personal Care",
+        "Education",
+        "Entertainment",
+        "Gifts",
+        "Shopping",
+        "Travel",
+        "Debt/Savings"
     ]
 
     while True:
@@ -126,7 +132,7 @@ def summarize_expenses(expense_file_path, budget):
 
 
 def green(text):
-    return text  # No colored output needed
+    return text  # No color formatting needed
 
 
 if __name__ == "__main__":
