@@ -1,11 +1,21 @@
-from expense import Expense
 import calendar
 import datetime
+from expense import Expense
+
+
+def reset_expenses(file_path: str):
+    with open(file_path, "w") as file:
+        pass  # Clears all content
+    print("✅ All expenses have been reset.\n")
 
 
 def main():
     print("Running Expense Tracker!")
     expense_file_path = "expenses.csv"
+
+    reset_choice = input("Do you want to reset all expenses? (y/n): ").lower()
+    if reset_choice == "y":
+        reset_expenses(expense_file_path)
 
     while True:
         print("Do you want to enter a (1) Monthly or (2) Daily allowance?")
@@ -42,18 +52,18 @@ def get_user_expense():
     expense_amount = float(input("Enter expense amount (₱): "))
 
     expense_categories = [
-        "Food",
-        "Transport",
-        "Bills",
-        "Health",
-        "Personal Care",
-        "Education",
-        "Entertainment",
-        "Gifts",
-        "Shopping",
-        "Travel",
-        "Debt",
-        "Savings"
+        "🍔 Food",
+        "🚌 Transport",
+        "🧾 Bills",
+        "🏥 Health",
+        "💅 Personal Care",
+        "🎓 Education",
+        "🎮 Entertainment",
+        "🎁 Gifts",
+        "🛍️ Shopping",
+        "✈️ Travel",
+        "💸 Debt",
+        "💰 Savings"
     ]
 
     while True:
@@ -75,7 +85,7 @@ def get_user_expense():
 
 def save_expense_to_file(expense_data: Expense, file_path: str):
     print(f"Saving Expense: {expense_data} to {file_path}")
-    with open(file_path, "a") as file:
+    with open(file_path, "a", encoding="utf-8") as file:
         file.write(f"{expense_data.name},{expense_data.amount},{expense_data.category}\n")
 
 
