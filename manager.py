@@ -3,7 +3,7 @@ import calendar
 import datetime
 
 class ExpenseManager:
-    def __init__(self, flie_path: str):
+    def __init__(self, file_path: str):
         self.file_path = file_path
 
     def reset_expenses(self):
