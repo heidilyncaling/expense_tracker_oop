@@ -1,7 +1,7 @@
 import calendar
 import datetime
 from expense import Expense
-from budget import Budget
+from budget import BudgetPlanner 
 
 class ExpenseManager:
     def __init__(self, file_path: str):
@@ -12,41 +12,17 @@ class ExpenseManager:
         with open(self.file_path, "a", encoding="utf-8") as file:
             file.write(f"{expense_data.name},{expense_data.amount},{expense_data.category}\n")
 
-class Budget:
-    def __init__(self, allowance: float, is_daily: bool):
-        self.allowance = allowance
-
-        self.is_daily = is_daily
-        self.current_date = datetime.datetime.now()
-        self.total_days = calendar.monthrange(self.current_date.year, self.current_date.month)[1]
-        self.remaining_days = self.total_days - self.current_date.day
-
-    def get_monthly_budget(self):
-        return self.allowance * self.total_days if self.is_daily else self.allowance
-    
-    def get_remaining_days(self):
-        return self.remaining_days
-    
-    def calculate_daily_budget(self, remaining_budget):
-        if self.remaining_days > 0:
-            return remaining_budget / self.remaining_days
-        return 0.0
+    def reset_expenses(self) -> None:
+        with open(self.file_path, "w") as file:
+            pass  # Overwrites the file, making it empty
+        print("✅ All expenses have been reset.\n")
 
 class UserInputHandler:
     def __init__(self):
         self.expense_categories = [
-            "🍔 Food",
-        "🚌 Transport",
-        "🧾 Bills",
-        "🏥 Health",
-        "💅 Personal Care",
-        "🎓 Education",
-        "🎮 Entertainment",
-        "🎁 Gifts",
-        "🛍️ Shopping",
-        "✈️ Travel",
-        "💸 Debt",
-        "💰 Savings"
+            "🍔 Food", "🚌 Transport", "🧾 Bills", "🏥 Health",
+            "💅 Personal Care", "🎓 Education", "🎮 Entertainment",
+            "🎁 Gifts", "🛍️ Shopping", "✈️ Travel", "💸 Debt", "💰 Savings"
         ]
 
     def get_expense_from_user(self) -> Expense:
@@ -79,17 +55,22 @@ class UserInputHandler:
 
 def main():
     file_path = "expenses.csv"
+    expense_manager = ExpenseManager(file_path)
+
+    reset = input("Do you want to reset all previous expenses? (y/n): ").lower()
+    if reset == "y":
+        expense_manager.reset_expenses()
 
     user_input_handler = UserInputHandler()
     user_expense = user_input_handler.get_expense_from_user()
 
-    allowance = float(input("Enter your allowance (₱): "))
-    is_daily = input("Is this a daily allowance? (y/n): ").lower() == "y"
+    budget_planner = BudgetPlanner()
+    monthly_budget = budget_planner.get_monthly_budget()
 
-    budget = Budget(allowance, is_daily)
-
-    expense_manager = ExpenseManager(file_path)
     expense_manager.save_expense(user_expense)
+
+    print(f"Remaining budget after 1 expense: ₱{monthly_budget - user_expense.amount:.2f}")
+
 
 if __name__ == "__main__":
     main()
