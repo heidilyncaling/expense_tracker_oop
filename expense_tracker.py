@@ -1,5 +1,6 @@
 import calendar
 import datetime
+from expense import Expense
 
 class Budget:
     def __init__(self, allowance: float, is_daily: bool):
@@ -19,20 +20,11 @@ class Budget:
         if self.remaining_days > 0:
             return remaining_budget / self.remaining_days
         return 0.0
-        
 
-    user_expense = get_user_expense()
-    save_expense_to_file(user_expense, expense_file_path)
-    summarize_expenses(expense_file_path, monthly_budget)
-
-
-def get_user_expense():
-    print("Getting User Expense")
-    expense_name = input("Enter expense name: ")
-    expense_amount = float(input("Enter expense amount (₱): "))
-
-    expense_categories = [
-        "🍔 Food",
+class UserInputHandler:
+    def __init__(self):
+        self.expense_categories = [
+            "🍔 Food",
         "🚌 Transport",
         "🧾 Bills",
         "🏥 Health",
@@ -44,23 +36,35 @@ def get_user_expense():
         "✈️ Travel",
         "💸 Debt",
         "💰 Savings"
-    ]
+        ]
 
-    while True:
-        print("Select a category:")
-        for index, category in enumerate(expense_categories):
-            print(f"  {index + 1}. {category}")
+    def get_expense_from_user(self) -> Expense:
+        print("Getting User Expense")
+        expense_name = input("Enter expense name: ")
 
-        category_range = f"[1 - {len(expense_categories)}]"
-        try:
-            selected_category_index = int(input(f"Enter a category number {category_range}: ")) - 1
-            if 0 <= selected_category_index < len(expense_categories):
-                selected_category = expense_categories[selected_category_index]
-                return Expense(name=expense_name, category=selected_category, amount=expense_amount)
-            else:
-                print("Invalid category. Please try again!")
-        except ValueError:
-            print("Please enter a valid number.")
+        while True:
+            try:
+                expense_amount = float(input("Enter expense amount (₱): "))
+                break
+            except ValueError:
+                print("Please enter a valid number.")
+
+        while True:
+            print("Select a category:")
+            for index, category in enumerate(self.expense_categories):
+                print(f"  {index + 1}. {category}")
+
+            try:
+                selected_index = int(input(f"Enter a category number [1 - {len(self.expense_categories)}]: ")) - 1
+                if 0 <= selected_index < len(self.expense_categories):
+                    selected_category = self.expense_categories[selected_index]
+                    break
+                else:
+                    print("Invalid category. Please try again.")
+            except ValueError:
+                print("Please enter a valid number.")
+
+        return Expense(name=expense_name, amount=expense_amount, category=selected_category)
 
 
 def save_expense_to_file(expense_data: Expense, file_path: str):
