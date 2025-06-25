@@ -62,15 +62,33 @@ def main():
         expense_manager.reset_expenses()
 
     user_input_handler = UserInputHandler()
-    user_expense = user_input_handler.get_expense_from_user()
+    
+    # Ask user how many expenses to enter
+    while True:
+        try:
+            num_expenses = int(input("How many expenses do you want to enter? "))
+            if num_expenses > 0:
+                break
+            else:
+                print("Please enter a number greater than 0.")
+        except ValueError:
+            print("Please enter a valid number.")
+
+    all_expenses = []
+    for i in range(num_expenses):
+        print(f"\n--- Expense {i + 1} ---")
+        expense = user_input_handler.get_expense_from_user()
+        all_expenses.append(expense)
+        expense_manager.save_expense(expense)
 
     budget_planner = BudgetPlanner()
     monthly_budget = budget_planner.get_monthly_budget()
 
-    expense_manager.save_expense(user_expense)
-
-    print(f"Remaining budget after 1 expense: ₱{monthly_budget - user_expense.amount:.2f}")
+    total_spent = sum(exp.amount for exp in all_expenses)
+    print(f"\nTotal spent: ₱{total_spent:.2f}")
+    print(f"Remaining budget: ₱{monthly_budget - total_spent:.2f}")
 
 
 if __name__ == "__main__":
     main()
+    
