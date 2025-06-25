@@ -1,10 +1,21 @@
 import calendar
 import datetime
 from expense import Expense
+from budget import Budget
+
+class ExpenseManager:
+    def __init__(self, file_path: str):
+        self.file_path = file_path
+
+    def save_expense(self, expense_data: Expense) -> None:
+        print(f"Saving Expense: {expense_data} to {self.file_path}")
+        with open(self.file_path, "a", encoding="utf-8") as file:
+            file.write(f"{expense_data.name},{expense_data.amount},{expense_data.category}\n")
 
 class Budget:
     def __init__(self, allowance: float, is_daily: bool):
         self.allowance = allowance
+
         self.is_daily = is_daily
         self.current_date = datetime.datetime.now()
         self.total_days = calendar.monthrange(self.current_date.year, self.current_date.month)[1]
@@ -16,7 +27,7 @@ class Budget:
     def get_remaining_days(self):
         return self.remaining_days
     
-    def calculate_daily_budget(self, remaining_budget)
+    def calculate_daily_budget(self, remaining_budget):
         if self.remaining_days > 0:
             return remaining_budget / self.remaining_days
         return 0.0
@@ -66,58 +77,19 @@ class UserInputHandler:
 
         return Expense(name=expense_name, amount=expense_amount, category=selected_category)
 
+def main():
+    file_path = "expenses.csv"
 
-def save_expense_to_file(expense_data: Expense, file_path: str):
-    print(f"Saving Expense: {expense_data} to {file_path}")
-    with open(file_path, "a", encoding="utf-8") as file:
-        file.write(f"{expense_data.name},{expense_data.amount},{expense_data.category}\n")
+    user_input_handler = UserInputHandler()
+    user_expense = user_input_handler.get_expense_from_user()
 
+    allowance = float(input("Enter your allowance (₱): "))
+    is_daily = input("Is this a daily allowance? (y/n): ").lower() == "y"
 
-def summarize_expenses(file_path: str, budget: float):
-    print("Summarizing Expenses")
-    expenses: list[Expense] = []
+    budget = Budget(allowance, is_daily)
 
-    try:
-        with open(file_path, "r", encoding="utf-8") as file:
-            lines = file.readlines()
-            for line in lines:
-                name, amount, category = line.strip().split(",")
-                loaded_expense = Expense(name=name, amount=float(amount), category=category)
-                expenses.append(loaded_expense)
-    except FileNotFoundError:
-        print("No expense file found yet.")
-        return
-    except Exception as error:
-        print(f"Error reading file: {error}")
-        return
-
-    expenses_by_category = {}
-    for expense_item in expenses:
-        if expense_item.category in expenses_by_category:
-            expenses_by_category[expense_item.category] += expense_item.amount
-        else:
-            expenses_by_category[expense_item.category] = expense_item.amount
-
-    print("Expenses By Category:")
-    for category, total_amount in expenses_by_category.items():
-        print(f"  {category}: ₱{total_amount:.2f}")
-
-    total_spent = sum(expense.amount for expense in expenses)
-    print(f"Total Spent: ₱{total_spent:.2f}")
-
-    remaining_budget = budget - total_spent
-    print(f"Budget Remaining: ₱{remaining_budget:.2f}")
-
-    current_date = datetime.datetime.now()
-    total_days_in_month = calendar.monthrange(current_date.year, current_date.month)[1]
-    days_remaining = total_days_in_month - current_date.day
-
-    if days_remaining > 0:
-        daily_budget = remaining_budget / days_remaining
-        print(f"Budget Per Day: ₱{daily_budget:.2f}")
-    else:
-        print("Month is ending today. Plan next month's budget!")
-
+    expense_manager = ExpenseManager(file_path)
+    expense_manager.save_expense(user_expense)
 
 if __name__ == "__main__":
     main()
